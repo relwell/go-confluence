@@ -2,10 +2,9 @@ package confluence
 
 import (
 	"encoding/json"
-	"strings"
-
 	"github.com/google/go-querystring/query"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
 
 // GetContent Returns all content in a Confluence instance.
@@ -101,6 +100,12 @@ func (client Client) UpdateContent(content *Content, qp *QueryParameters) (Conte
 // CreateContentBodyParameters query parameters for CreateContent
 type CreateContentBodyParameters struct {
 	Content
+	Ancestors []struct {
+		ID string `json:"id,omitempty"`
+	} `json:"ancestors,omitempty"`
+	Space struct {
+		Key string `json:"key,omitempty"`
+	} `json:"space,omitempty"`
 }
 
 // DeleteContent oves a piece of content to the space’s trash or purges it from the trash, depending on the content’s type and status:
@@ -118,19 +123,17 @@ type ContentResponse struct {
 	Results []Content `json:"results"`
 }
 
+type Label struct {
+	Name string `json:"name"`
+}
+
 // Content represents the data returned from the Confluence API
 type Content struct {
-	ID        string `json:"id,omitempty"`
-	Type      string `json:"type,omitempty"`
-	Status    string `json:"status,omitempty"`
-	Title     string `json:"title,omitempty"`
-	URL       string `json:"url,omitempty"`
-	Ancestors []struct {
-		ID string `json:"id,omitempty"`
-	} `json:"ancestors,omitempty"`
-	Space struct {
-		Key string `json:"key,omitempty"`
-	} `json:"space,omitempty"`
+	ID      string `json:"id,omitempty"`
+	Type    string `json:"type,omitempty"`
+	Status  string `json:"status,omitempty"`
+	Title   string `json:"title,omitempty"`
+	URL     string `json:"url,omitempty"`
 	Version struct {
 		Number int `json:"number,omitempty"`
 	} `json:"version,omitempty"`
@@ -144,6 +147,9 @@ type Content struct {
 			} `json:"_expandable,omitempty"`
 		} `json:"storage,omitempty"`
 	} `json:"body,omitempty"`
+	Metadata struct {
+		Labels []Label `json:"labels,omitempty"`
+	} `json:"metadata,omitempty"`
 	Links struct {
 		Self   string `json:"self,omitempty"`
 		Tinyui string `json:"tinyui,omitempty"`
